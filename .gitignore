@@ -1,5 +1,8 @@
 config.py
 
+# ignore jpg files
+*.jpg
+
 # Default .gitignore
 
 *.py[cod]
