@@ -10,7 +10,7 @@ from Yowsup.Common.debugger import Debugger
 USERNAME = '972583340860'
 PASSWORD = 'jag6FSF6MicZmp9M8lrsSqoXYo8='.decode('base64')
 
-DEBUG_JID = '972587011235@s.whatsapp.net'
+DEBUG_JID = '13104874553@s.whatsapp.net'
 
 phase = None
 cm = None
@@ -62,7 +62,7 @@ def cb_message_sent(jid, message_id):
 # Main
 
 def setup():
-    Debugger.enabled = False    
+    Debugger.enabled = True    
     global cm, signals_interface, methods_interface
     print 'Settng up environment'
 
@@ -103,9 +103,7 @@ def last_online(phone_number):
     methods_interface.call('presence_sendAvailable')
 
     # methods_interface.call('presence_subscribe', (jid,))
-    # methods_interface.call('presence_subscribe', (jid,))
-
-    print methods_interface.call('presence_request', (jid,))    
+    methods_interface.call('presence_request', (jid,))    
 
     print 'Called'
     while phase is None:
@@ -146,10 +144,16 @@ run()
 #     return send_file(profile_picture_path, mimetype='image/jpeg')
 
 if __name__ == '__main__':
+    maxnumber = '13104874553'
     # app.run(debug=True, port=5000)
+
     global profile_picture_path
-    phone_number = '13104874553'
+
+    phone_number = maxnumber
+
+    # send_debug('trying')
     # generate_profile_picture(phone_number)
+
     last_online(phone_number)
     # send_debug(request.remote_addr + ' :: ' + phone_number)
     # return send_file(profile_picture_path, mimetype='image/jpeg')
