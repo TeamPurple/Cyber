@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, redirect
 from whatspy import Whatspy
 from datetime import datetime
 app = Flask(__name__)
@@ -10,8 +10,11 @@ image_searcher = None
 def index():
     return render_template('purple.html')
 
-@app.route('/view', methods=['POST'])
+@app.route('/view', methods=['GET', 'POST'])
 def view():
+    if 'phone_number' not in request.form:
+        return redirect(url_for('index'))
+
     whatspy = Whatspy()
     phone_number = request.form['phone_number']
 
