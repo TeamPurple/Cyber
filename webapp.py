@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 from whatspy import Whatspy
 app = Flask(__name__)
 
@@ -9,12 +9,15 @@ image_searcher = None
 def index():
     return render_template('purple.html')
 
-@app.route('/view')
+@app.route('/view', methods=['POST'])
 def view():
-    # note: photo_path/last_time can be None
     whatspy = Whatspy()
-    photo_path, last_time = whatspy.get_photo_time('13104874553')
-    return render_template('results.html', photo_path=photo_path)
+    phone_number = request.form['phone_number']
+
+    # note: photo_path/last_time can be None
+    photo_path, last_time = whatspy.get_photo_time(phone_number)
+
+    return render_template('results.html', photo_path=photo_path, phone_number=phone_number)
 
 @app.route('/reverse_image/<local_image_path>')
 def reverse_image(local_image_path):
