@@ -22,7 +22,8 @@ def view():
     photo_path, last_time = whatspy.get_photo_time(phone_number)
 
     # parse as a datetime
-    last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
+    if last_time:
+      last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
 
     return render_template('results.html', photo_path=photo_path, last_time=last_time, phone_number=phone_number)
 
