@@ -1,6 +1,7 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, jsonify
 from whatspy import Whatspy
 from datetime import datetime
+import requests, json
 app = Flask(__name__)
 
 from reverse_image import ReverseImageSearcher
@@ -39,6 +40,12 @@ def get_reverse_image_results(local_image_path):
         image_searcher = ReverseImageSearcher()
 
     return image_searcher.get_results(local_image_path)
+
+@app.route('/timeline', methods=['POST'])
+def timeline():
+    phone = request.form['phone']
+    r = requests.get('http://50.112.143.163/?phone=' + phone)
+    return jsonify(json.loads(r.text))
 
 # Fire up the server
 if __name__ == '__main__':
