@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request
 from whatspy import Whatspy
+from datetime import datetime
 app = Flask(__name__)
 
 from reverse_image import ReverseImageSearcher
@@ -17,7 +18,10 @@ def view():
     # note: photo_path/last_time can be None
     photo_path, last_time = whatspy.get_photo_time(phone_number)
 
-    return render_template('results.html', photo_path=photo_path, phone_number=phone_number)
+    # parse as a datetime
+    last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
+
+    return render_template('results.html', photo_path=photo_path, last_time=last_time, phone_number=phone_number)
 
 @app.route('/reverse_image/<local_image_path>')
 def reverse_image(local_image_path):
