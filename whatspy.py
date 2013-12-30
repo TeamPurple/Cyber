@@ -11,6 +11,8 @@ cm = None
 signals_interface = None
 methods_interface = None
 
+phone_path = 'static/phone_images/'
+
 # Utils
 def phone_number2jid(phone_number):
     return phone_number + '@s.whatsapp.net'
@@ -46,8 +48,9 @@ def cb_contact_gotProfilePicture_once(jid, picture_id, image_path):
     global photo_got
     phone_number = jid.split('@')[0]
     print 'Got', phone_number
-    shutil.copyfile(image_path, os.path.join(args.t, phone_number + '.jpg'))
-    photo_got = True # set photo to this
+    new_path = os.path.join(phone_path, phone_number + '.jpg')
+    shutil.copyfile(image_path, new_path)
+    photo_got = new_path
 
 # Misc
 def cb_disconnected(reason):
@@ -93,13 +96,10 @@ def get_photo_time(phone_number):
     methods_interface.call('contact_getProfilePicture', (jid,))
     
     timeout = 0
-    while not (photo_got and time_got) and timeout < 1:
+    while not (photo_got and time_got) and timeout < 5:
         print photo_got, time_got
         time.sleep(0.25)
         timeout += 0.25
 
 #    methods_interface.call('disconnect', ('closed!',))
     return (photo_got, time_got)
-
-print get_photo_time('16094755004')
-print get_photo_time('16094755004')
