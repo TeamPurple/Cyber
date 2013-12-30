@@ -2,6 +2,11 @@ html,
 body {
   background-color: #563D7C;
 }
-.input-page {
+.widget {
   margin-top: 80px;
+  width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #FFFFFF;
+  text-align: center;
 }
