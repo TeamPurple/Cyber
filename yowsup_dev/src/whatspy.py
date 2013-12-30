@@ -89,11 +89,14 @@ def batch(phone_numbers_path):
         phone_numbers = f.read().split('\n')
 
     for number_name in phone_numbers:
-        phone_number, name = number_name.split(' ')
-        jid = phone_number2jid(phone_number)
+        try:
+            phone_number, name = number_name.split(' ')
+            jid = phone_number2jid(phone_number)
 
-        print 'Request', phone_number, name
-        methods_interface.call('presence_request', (jid,))
+            print 'Request', phone_number, name
+            methods_interface.call('presence_request', (jid,))
+        except:
+            print 'error on', number_name
         time.sleep(2)
 
 setup()
