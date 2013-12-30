@@ -6,6 +6,7 @@ from Yowsup.Common.debugger import Debugger
 
 USERNAME = '972583340860'
 PASSWORD = 'jag6FSF6MicZmp9M8lrsSqoXYo8='.decode('base64')
+DATA_DIR = '/home/ubuntu/data_files/'
 
 phase = None
 cm = None
@@ -38,7 +39,7 @@ def cb_presence_updated(jid, last_seen):
     print 'Last seen @', time.ctime(time.time() - last_seen)
 
 def write_available(phone_number, pull_time, last_online):
-    f = open(phone_number + '.data', 'a')
+    f = open(DATA_DIR + phone_number + '.data', 'a')
     f.write(str(pull_time) + ',' + str(last_online) + '\n')
     f.close()
     
