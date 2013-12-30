@@ -8,11 +8,13 @@ import lxml.html.clean
 import lxml.cssselect
 import cssutils
 import re
+import logging
 
 class ReverseImageSearcher(object):
     def __init__(self):
         conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
         self.bucket = conn.get_bucket(AWS_BUCKET)
+        cssutils.log.setLevel(logging.FATAL)
 
     def get_results(self, local_image_path):
         image_url = self._upload_to_s3(local_image_path)
