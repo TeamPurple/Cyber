@@ -37,8 +37,6 @@ import hashlib
 import base64
 import sys
 
-
-
 import traceback
 class YowsupConnectionManager:
 	
@@ -374,10 +372,12 @@ class YowsupConnectionManager:
 		self._writeNode(iqNode);
 
 	def getLastOnline(self,jid):
-
+                print 'In getLastOnline'
 		if len(jid.split('-')) == 2 or jid == "Server@s.whatsapp.net": #SUPER CANCEL SUBSCRIBE TO GROUP AND SERVER
-			return
+                        import pdb; pdb.set_trace()
 
+			return
+                
 		self.sendSubscribe(jid);
 
 		self._d("presence request Initiated for %s"%(jid))
@@ -387,6 +387,7 @@ class YowsupConnectionManager:
 		query = ProtocolTreeNode("query",{"xmlns":"jabber:iq:last"});
 		iqNode = ProtocolTreeNode("iq",{"id":idx,"type":"get","to":jid},[query]);
 		self._writeNode(iqNode)
+                import pdb; pdb.set_trace()
 
 
 	def sendIq(self):
@@ -757,8 +758,8 @@ class ReaderThread(threading.Thread):
 			else:
 				if countdown % (self.selectTimeout*10) == 0 or countdown < 11:
 					self._d("Waiting, time to die: T-%i seconds" % countdown )
-					
-				if self.timeout-countdown == 150 and self.ping and self.autoPong:
+
+				if countdown < 150  and self.ping and self.autoPong:
 					self.ping()
 
 				self.selectTimeout = 1 if countdown < 11 else 3
@@ -1034,7 +1035,7 @@ class ReaderThread(threading.Thread):
 			return;
 
 		pictureNode = node.getChild("picture")
-		if pictureNode.data is not None:
+		if pictureNode is not None and pictureNode.data is not None:
 			tmp = self.createTmpFile(pictureNode.data if sys.version_info < (3, 0) else pictureNode.data.encode('latin-1'), "wb")
 
 			pictureId = int(pictureNode.getAttributeValue('id'))
