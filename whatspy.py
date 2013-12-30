@@ -9,6 +9,8 @@ TIMEOUT_SECS = 5
 
 def phone_number2jid(phone_number):
     return phone_number + '@s.whatsapp.net'
+def image_location(phone_number):
+    return os.path.join(PHONE_PATH, phone_number + '.jpg')
 
 class Whatspy(object):
     phase = None
@@ -40,7 +42,7 @@ class Whatspy(object):
     def cb_contact_gotProfilePicture_once(self, jid, picture_id, image_path):
         phone_number = jid.split('@')[0]
         print 'Got', phone_number
-        new_path = os.path.join(PHONE_PATH, phone_number + '.jpg')
+        new_path = image_location(phone_number)
         shutil.copyfile(image_path, new_path)
         self.photo_got = new_path
 
@@ -69,13 +71,17 @@ class Whatspy(object):
         while self.phase is None:
             time.sleep(0.5)
 
-        self.signals_interface.registerListener('contact_gotProfilePicture', self.cb_contact_gotProfilePicture_once)
         self.signals_interface.registerListener('presence_updated', self.cb_presence_updated_once)
 
         jid = phone_number2jid(phone_number)
         self.methods_interface.call('presence_request', (jid,))
 
-        self.methods_interface.call('contact_getProfilePicture', (jid,))
+        # only get image if doesn't already exist
+        if os.path.isfile(image_location(phone_number)):
+          self.photo_got = image_location(phone_number)
+        else:
+          self.signals_interface.registerListener('contact_gotProfilePicture', self.cb_contact_gotProfilePicture_once)
+          self.methods_interface.call('contact_getProfilePicture', (jid,))
 
         timeout = 0
         while not (self.photo_got and self.time_got) and timeout < TIMEOUT_SECS:
