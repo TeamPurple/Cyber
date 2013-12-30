@@ -11,15 +11,16 @@
 
     <script type="text/javascript">
       var endpoint_url = "{{ endpoint_url }}";
+
+      showResults = function(data) {
+        $('#resultsFrame').html(data);
+      };
+
       $(document).ready(function() {
         $.ajax({
           url: endpoint_url,
-          success:
-            function(data) {
-              $('#resultsFrame').contents().find('html').html(data);
-            },
+          success: showResults,
         });
-        console.log(1);
       });
     </script>
   </head>
@@ -33,10 +34,8 @@
 
     </div>
 
-	<div class="container">
-    <iframe id="resultsFrame" src="about:blank" style="width:100%; height:1000px;">
-    </iframe>
-	</div>
+  	<div class="container" id="resultsFrame">
+  	</div>
 
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
