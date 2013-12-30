@@ -374,20 +374,17 @@ class YowsupConnectionManager:
 	def getLastOnline(self,jid):
                 print 'In getLastOnline'
 		if len(jid.split('-')) == 2 or jid == "Server@s.whatsapp.net": #SUPER CANCEL SUBSCRIBE TO GROUP AND SERVER
-                        import pdb; pdb.set_trace()
-
 			return
                 
 		self.sendSubscribe(jid);
 
 		self._d("presence request Initiated for %s"%(jid))
 		idx = self.makeId("last_")
-		self.readerThread.requests[idx] = self.readerThread.parseLastOnline;
+		self.readerThread.requests[idx] = self.readerThread.parseLastOnline
 
-		query = ProtocolTreeNode("query",{"xmlns":"jabber:iq:last"});
-		iqNode = ProtocolTreeNode("iq",{"id":idx,"type":"get","to":jid},[query]);
+		query = ProtocolTreeNode("query",{"xmlns":"jabber:iq:last"})
+		iqNode = ProtocolTreeNode("iq",{"id":idx,"type":"get","to":jid},[query])
 		self._writeNode(iqNode)
-                import pdb; pdb.set_trace()
 
 
 	def sendIq(self):
@@ -911,7 +908,7 @@ class ReaderThread(threading.Thread):
 		seconds = firstChild.getAttributeValue("seconds");
 		status = None
 		status = firstChild.data #@@TODO discarded?
-
+                print 'seconds', seconds
 		try:
 			if seconds is not None and jid is not None:
 				self.signalInterface.send("presence_updated", (jid, int(seconds)))
