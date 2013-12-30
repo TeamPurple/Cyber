@@ -16,7 +16,7 @@ args = None
 
 # Utils
 def phone_number2jid(phone_number):
-    return '972' +  phone_number[1:] + '@s.whatsapp.net'
+    return phone_number + '@s.whatsapp.net'
 
 # Login
 
@@ -38,7 +38,24 @@ def login():
 def cb_presence_updated(jid, last_seen):
     print 'Last seen @', time.ctime(time.time() - last_seen)
 
+def cb_presence_updated_once(jid, last_seen):
+    ''' TODO: save the time to something and then use the web app to load it'''
+    global time_got
+    print 'HELLo'
+    print 'Last seen @', time.ctime(time.time() - last_seen)
+    time_got = True
+    
 # Contacts
+def cb_contact_gotProfilePicture_once(jid, picture_id, image_path):
+    ''' for eric to use for web app
+    TODO: modify the path so that it goes to where you want
+    TODO: modify a global variable so it knows its done'''
+    global photo_got
+    phone_number = jid.split('@')[0]
+    print 'Got', phone_number
+    # shutil.copyfile(image_path, os.path.join(args.t, phone_number + '.jpg'))
+    photo_got = True
+
 def cb_contact_gotProfilePicture_interactive(jid, picture_id, image_path):
     image = Image.open(image_path)
     image.show()
@@ -90,9 +107,35 @@ def batch(phone_numbers_path, profiles_picture_path):
 
     time.sleep(10)
 
+def get_photo_time(phone_number):
+    ''' phone number includes the country code
+    '''
+    global photo_got, time_got
+    setup()
+    login()
+    photo_got = False
+    time_got = False
+    while phase is None:
+        time.sleep(0.5)
+
+    signals_interface.registerListener('contact_gotProfilePicture', cb_contact_gotProfilePicture_once)
+    signals_interface.registerListener('presence_updated', cb_presence_updated_once)
+
+    jid = phone_number2jid(phone_number)
+    methods_interface.call('presence_request', (jid,))
+
+    methods_interface.call('contact_getProfilePicture', (jid,))
+    
+    while not (photo_got and time_got):
+        #TODO: Time out the request for both photo and time depending on whats available
+        print photo_got, time_got
+        time.sleep(0.5)
+            
+    methods_interface.call('disconnect', ('closed!',))
+        
 def interactive():
     signals_interface.registerListener('presence_updated', cb_presence_updated)
-    signals_interface.registerListener('contact_gotProfilePicture', cb_contact_gotProfilePicture_interactive)
+    signals_interface.registerListener('contact_gotProfilePicture', cb_contact_gotProfilePicture_once)
     
     try:
         while True:
@@ -101,9 +144,8 @@ def interactive():
             if cmd == 'exit':
                 break
 
-            elif len(cmd) == 10 and cmd.isdigit():
+            elif cmd.isdigit():
                 jid = phone_number2jid(cmd)
-
                 methods_interface.call('presence_request', (jid,))
                 methods_interface.call('contact_getProfilePicture', (jid,))
 
@@ -111,7 +153,7 @@ def interactive():
                 continue
                 
             else:
-                print 'Not Israeli Mobile Phone Number...'
+                print 'Not a valid number...'
 
             time.sleep(2)
 
@@ -129,20 +171,20 @@ batch_parser.add_argument('-t', required=True, help='profiles picture directory'
 
 args = parser.parse_args()
 
-setup()
+get_photo_time('16094755004')
 
-login()
+# setup()
 
-while phase is None:
-    time.sleep(0.5)
+# login()
 
-if phase:
+# while phase is None:
+#     time.sleep(0.5)
 
+# if phase:
+#     if args.mode == 'interactive':
+#         interactive()
 
-    if args.mode == 'interactive':
-        interactive()
-
-    elif args.mode == 'batch':
-        batch(args.p, args.t)
+#     elif args.mode == 'batch':
+#         batch(args.p, args.t)
     
-methods_interface.call('disconnect', ('closed!',))
+# methods_interface.call('disconnect', ('closed!',))
