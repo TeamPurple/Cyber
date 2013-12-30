@@ -1,0 +1,2 @@
+requests==2.1.0
+twitter==1.10.2
