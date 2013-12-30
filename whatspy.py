@@ -1,7 +1,7 @@
 import sys, os, time, shutil
 
-from yowsup.src.Yowsup.connectionmanager import YowsupConnectionManager
-from yowsup.src.Yowsup.Common.debugger import Debugger
+from Yowsup.connectionmanager import YowsupConnectionManager
+from Yowsup.Common.debugger import Debugger
 
 USERNAME = '972583340860'
 PASSWORD = 'jag6FSF6MicZmp9M8lrsSqoXYo8='.decode('base64')
