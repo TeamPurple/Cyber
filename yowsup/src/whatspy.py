@@ -38,6 +38,12 @@ def login():
 def cb_presence_updated(jid, last_seen):
     print 'Last seen @', time.ctime(time.time() - last_seen)
 
+def cb_presence_updated_batch(jid, last_seen):
+    now = time.time()
+    last = time.time() - last_seen
+    print 'Last seen @', time.ctime(time.time() - last_seen)
+
+    
 def cb_presence_updated_once(jid, last_seen):
     ''' TODO: save the time to something and then use the web app to load it'''
     global time_got
@@ -67,13 +73,12 @@ def cb_contact_gotProfilePicture_batch(jid, picture_id, image_path):
 
 # Misc
 def cb_disconnected(reason):
-        print 'Disconnected because %s' % reason
-        sys.exit(0)
+    print 'Disconnected because %s' % reason
+    sys.exit(0)
 
 # Main
 
 def setup():
-
     global cm, signals_interface, methods_interface
 
     Debugger.enabled = False
@@ -90,15 +95,16 @@ def setup():
     signals_interface.registerListener('disconnected', cb_disconnected)
 
 def batch(phone_numbers_path, profiles_picture_path):
-    signals_interface.registerListener('contact_gotProfilePicture', cb_contact_gotProfilePicture_batch)
+    signals_interface.registerListener('presence_updated', cb_presence_updated_batch)
     
     with open(phone_numbers_path, 'rb') as f:
         phone_numbers = f.read().split('\n')
-
+        
     if not os.path.exists(profiles_picture_path):
         os.mkdir(profiles_picture_path)
 
-    for phone_number in phone_numbers:
+    for number_name in phone_numbers:
+        phone_number, name = number_name.split(' ')
         jid = phone_number2jid(phone_number)
 
         print 'Request', phone_number
@@ -160,31 +166,16 @@ def interactive():
     except KeyboardInterrupt:
         print
 
-parser = argparse.ArgumentParser()
-mode_subparsers = parser.add_subparsers(dest='mode', help='choose operation mode')
 
-interactive_parser = mode_subparsers.add_parser('interactive', help='interactive phone number query of profile picture & last seen')
 
-batch_parser = mode_subparsers.add_parser('batch', help='batch phone numbers query of profile picture')
-batch_parser.add_argument('-p', required=True, help='phone numbers file (seperated by new line')
-batch_parser.add_argument('-t', required=True, help='profiles picture directory')
+setup()
+login()
 
-args = parser.parse_args()
+while phase is None:
+    time.sleep(0.5)
 
-get_photo_time('16094755004')
-
-# setup()
-
-# login()
-
-# while phase is None:
-#     time.sleep(0.5)
-
-# if phase:
-#     if args.mode == 'interactive':
-#         interactive()
-
-#     elif args.mode == 'batch':
-#         batch(args.p, args.t)
+p = 'numbers.txt'
+if phase:
+    batch(p)
     
-# methods_interface.call('disconnect', ('closed!',))
+methods_interface.call('disconnect', ('closed!',))
