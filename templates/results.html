@@ -28,6 +28,9 @@
 	  </div>
 	  <button type="submit" class="btn btn-default">Search</button>
 	  </form>
+	  <div id="chart">
+	    <svg></svg>
+	  </div>
     </div><!-- /.container -->
 
 	<div class="container widget">
@@ -44,15 +47,87 @@
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/static/js/nv.d3.js"></script>
 	<script>
-	/*
-	var createTimeline = function(data) {
-	  
+	var testData = function() {
+	  var fakeData = [
+	    {x: 1388430283171, y: 1},
+	    {x: 1388430283171 + 5000, y: 0},
+	    {x: 1388430292915, y: 1},
+	    {x: 1388430292915 + 5000, y: 0},
+	  ];
+ 
+	  return [
+	    {
+	      values: fakeData,
+	      key: 'Online Status',
+	      color: '#ff7f0e'
+	    }
+	  ];
 	};
 
-	$.getJSON( "ajax/test.json", function( data ) {
-	  var items = [];
-	});*/
+	// data is an array of integers, each of which corresponds to the "last 
+	// signed out" time of the user. returns an array of objects for each
+	// point in the graph of the format {x: 1388430283171, y: 1}, where x is
+	// the timestamp and y is 1 if the user is signed in and 0 otherwise. 
+	var formatData = function(data) {
+	    var dataPoints = [];
+		$.each( data, function( key, xValue ) {
+			console.log(xValue);
+		    dataPoints.push({x: xValue + 1, y: 0});
+		    dataPoints.push({x: xValue, y: 1});
+		    dataPoints.push({x: xValue - 60 * 1000, y: 1});
+		    dataPoints.push({x: xValue - 60 * 1000 - 1, y: 0});
+		});
+		console.log(dataPoints);
+		return [
+	      {
+	        values: dataPoints,
+	        key: 'Online Status',
+	        color: '#ff7f0e'
+	      }
+	    ];
+	}
+	
+	var createTimeline = function(data) {
+
+		// initialize graph itself
+		nv.addGraph(function() {
+		  var chart = nv.models.lineChart();
+ 
+		  chart.xAxis
+		      .axisLabel('Time')
+		.tickFormat(function(d) {
+		  return d3.time.format('%I:%m %p')(new Date(d))
+		      });
+ 
+		  chart.yAxis
+		      .axisLabel('Online Status')
+		      .tickFormat(d3.format('.02f'));
+ 
+		  d3.select('#chart svg')
+		      .datum(data)
+		    .transition().duration(500)
+		      .call(chart);
+ 
+		  nv.utils.windowResize(chart.update);
+ 
+		  return chart;
+		})};
+
+  	//createTimeline(testData);
+  	createTimeline(formatData([1388430283171, 1388430292915]));
+	
+	// TODO(dina): uncomment this when flask endpoint exists.
+//  $.getJSON( "/timeline", function( data ) {
+// 	  createTimeline(data);
+// 	});
 	</script>
+	<style>
+	  #chart svg {
+	    height: 400px;
+	  }
+	</style>
+ 
+	
   </body>
 </html>
 
