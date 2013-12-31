@@ -94,9 +94,8 @@
 		nv.addGraph(function() {
 		  var chart = nv.models.lineChart();
  
-		  chart.xAxis
-		      .axisLabel('Time')
-		.tickFormat(function(d) {
+		  chart.xAxis.axisLabel('Time')
+		    .tickFormat(function(d) {
 		  return d3.time.format('%I:%m %p')(new Date(d))
 		      });
  
@@ -118,7 +117,7 @@
   	createTimeline(formatData([1388430283171, 1388430292915]));
 	
 	// TODO(dina): uncomment this when flask endpoint exists.
-//  $.getJSON( "/timeline", function( data ) {
+//  $.getJSON( "/timeline&phone=" + {{ phone_number }}, function( data ) {
 // 	  createTimeline(data);
 // 	});
 	</script>
