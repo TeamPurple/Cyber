@@ -10,3 +10,30 @@ body {
   color: #FFFFFF;
   text-align: center;
 }
+
+
+@-webkit-keyframes ROTATE {
+    from    { -webkit-transform: rotate(0); }
+    to      { -webkit-transform: rotate(360deg); }
+
+}
+@-moz-keyframes ROTATE {
+    from    { -moz-transform: rotate(0); }
+    to      { -moz-transform: rotate(360deg); }
+}
+@-ms-keyframes ROTATE {
+    from    { -ms-transform: rotate(0); }
+    to      { -ms-transform: rotate(360deg); }
+}
+@-o-keyframes ROTATE {
+    from    { -o-transform: rotate(0); }
+    to      { -o-transform: rotate(360deg); }
+}
+@keyframes ROTATE {
+    from    { transform: rotate(0); }
+    to      { transform: rotate(360deg); }
+}
+
+.loading-icon {
+
+}
