@@ -102,10 +102,10 @@
 	  </div>
 	  <button type="submit" class="btn btn-default">Search</button>
 	  </form>
+	-->
 	  <div id="chart">
 	    <svg></svg>
 	  </div>
-    -->
     </div><!-- /.container -->
 
   	<div class="container widget querying" id="whatsApp">
@@ -136,6 +136,7 @@
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/static/js/nv.d3.js"></script>
 	<script>
+	/*
 	var testData = function() {
 	  var fakeData = [
 	    {x: 1388430283171, y: 1},
@@ -151,6 +152,7 @@
 	      color: '#ff7f0e'
 	    }
 	  ];
+    createTimeline(testData); */
 
 	// data is an array of integers, each of which corresponds to the "last 
 	// signed out" time of the user. returns an array of objects for each
@@ -200,12 +202,10 @@
 		  return chart;
 		})};
 
-  	//createTimeline(testData);
   	createTimeline(formatData([1388430283171, 1388430292915]));
 	
-	// TODO(dina): uncomment this when flask endpoint exists.
     $.getJSON( "/timeline&phone=" + {{ phone_number }}, function( data ) {
-	  createTimeline(data);
+	  //createTimeline(data);
 	});
 	</script>
 	<style>

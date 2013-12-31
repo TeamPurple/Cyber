@@ -59,10 +59,12 @@ def reverse_image_endpoint():
     bucket = get_s3_bucket()
     return reverse_image.get_results(local_image_path, bucket)
 
-@app.route('/timeline', methods=['POST'])
+@app.route('/timeline', methods=['GET'])
 def timeline():
-    phone = request.form['phone']
+    phone = request.args['phone']
+    print phone
     r = requests.get('http://50.112.143.163/?phone=' + phone)
+    print r.text
     return jsonify(json.loads(r.text))
 
 @app.route('/ajax/facebook', methods=['POST'])
