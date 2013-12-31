@@ -181,6 +181,26 @@
 
 		// initialize graph itself
 		nv.addGraph(function() {
+		var chart = nv.models.discreteBarChart()
+		      .x(function(d) { return d.x })
+		      .y(function(d) { return d.y })
+		      .staggerLabels(true)
+		      .tooltips(false)
+		      .showValues(true)
+
+		  d3.select('#chart svg')
+		      .datum(data)
+		    .transition().duration(500)
+		      .call(chart);
+			  
+		  chart.xAxis.axisLabel('Time')
+			    .tickFormat(function(d) {
+			  return d3.time.format('%I:%m %p')(new Date(d))
+			      });
+		  nv.utils.windowResize(chart.update);
+          return chart;
+		  
+		  /*
 		  var chart = nv.models.lineChart();
  
 		  chart.xAxis.axisLabel('Time')
@@ -199,7 +219,7 @@
  
 		  nv.utils.windowResize(chart.update);
  
-		  return chart;
+		  return chart;*/
 		})};
 
   	createTimeline(formatData([1388430283171, 1388430292915]));
