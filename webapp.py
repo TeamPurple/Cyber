@@ -7,7 +7,7 @@ app = Flask(__name__)
 import reverse_image
 import facebook
 
-from config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET, FACEBOOK_APP_CREDS
+from config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET, FACEBOOK_APP_CREDS, FLASK_HOST, FLASK_PORT
 from boto.s3.connection import S3Connection
 
 @app.route('/')
@@ -77,4 +77,4 @@ def facebook_endpoint():
 
 # Fire up the server
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host=FLASK_HOST, port=FLASK_PORT)
