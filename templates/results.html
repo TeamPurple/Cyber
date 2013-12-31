@@ -188,11 +188,9 @@
 	var createBuckets = function(data) {
 		var bucket_list = []
 		var currentHour = (new Date).getHours();
-		for (var i = currentHour; i < 24; i++) {
-		    bucket_list.push({x: i, y: 0});
-		}
-		for (var i = 0; i < currentHour; i++) {
-		    bucket_list.push({x: i, y: 0});
+		var loginFrequency = new Object();
+		for (var i = 0; i < 24; i++) {
+			loginFrequency[i] = 0.1;
 		}
 		// return bucket for hour
 		$.each(data, function(key, unix_timestamp ) {
@@ -200,9 +198,15 @@
 		  if (unix_timestamp * 1000 > (new Date).getTime() - 86400000) {
 		      var date = new Date(unix_timestamp*1000);
   	    	  var hour = date.getHours();
-		      bucket_list.push({x: hour, y: 1});
+			  loginFrequency[hour] += 1;
 		  }
 		});
+		for (var i = currentHour + 1; i < 24; i++) {
+		    bucket_list.push({x: i, y: loginFrequency[i]});
+		}
+		for (var j = 0; j <= currentHour; j++) {
+		    bucket_list.push({x: j, y: loginFrequency[j]});
+		}
 		return [
 	      {
 	        values: bucket_list,
@@ -218,20 +222,22 @@
 
 		var chart = nv.models.discreteBarChart()
 		      .x(function(d) { return d.x })
-		      .y(function(d) { return d.y })
 		      .staggerLabels(true)
-		      .tooltips(false)
-
+		      .tooltips(true)
+			  .color(['white']);
+		  chart.xAxis.axisLabel('Hour');
+		  chart.yAxis.axisLabel('Frequency')
+			   .axisLabelDistance(40);
 		  d3.select('#chart svg')
 		      .datum(data)
 		    .transition().duration(500)
-		      .call(chart);
-			  
-		  chart.xAxis.axisLabel('Hour')
-		       .axisLabelDistance(40);
-		  chart.yAxis
-		       .axisLabel('Online Status')
-			   .axisLabelDistance(40);
+		      .call(chart)
+			  .attr("fill", "white");
+	      d3.selectAll("rect.nv-bar")
+		      .style("fill", function(d, i){
+	              return "white";
+		      });
+
 			   
 		  nv.utils.windowResize(chart.update);
           return chart;
@@ -247,6 +253,9 @@
 	<style>
 	  #chart svg {
 	    height: 400px;
+	  }
+	  .nv-y text{
+	      display: none;
 	  }
 	</style>
  
