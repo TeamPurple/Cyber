@@ -7,7 +7,7 @@ app = Flask(__name__)
 import reverse_image
 import facebook
 
-from config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET
+from config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET, FACEBOOK_APP_CREDS
 from boto.s3.connection import S3Connection
 
 @app.route('/')
@@ -70,7 +70,10 @@ def timeline():
 def facebook_endpoint():
     phone_number = request.form['phone_number']
     fbid = facebook.lookup_facebook_by_phone(phone_number)
-    return str(fbid)
+
+    token = FACEBOOK_APP_CREDS['app_id'] + '|' + FACEBOOK_APP_CREDS['app_secret']
+    url = 'https://graph.facebook.com/' + str(fbid) + '?key=value&access_token=' + token
+    return jsonify(json.loads(requests.get(url).text))
 
 # Fire up the server
 if __name__ == '__main__':
