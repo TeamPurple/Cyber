@@ -76,3 +76,9 @@ body {
 .down {
   margin-top: 25px;
 }
+.small-line {
+  margin-top: 5px;
+  font-size: 13px;
+  color: #8977A3;
+  text-align: center;
+}
