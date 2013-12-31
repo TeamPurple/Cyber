@@ -4,8 +4,10 @@ from datetime import datetime
 import requests, json
 app = Flask(__name__)
 
-from reverse_image import ReverseImageSearcher
-image_searcher = None
+import reverse_image
+
+from config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET
+from boto.s3.connection import S3Connection
 
 @app.route('/')
 def index():
@@ -29,17 +31,23 @@ def view():
     return render_template('results.html', photo_path=photo_path, last_time=last_time, phone_number=phone_number)
 
 @app.route('/reverse_image/<local_image_path>')
-def reverse_image(local_image_path):
+def reverse_image_tester(local_image_path):
     endpoint_url = url_for("get_reverse_image_results", local_image_path=local_image_path)
     return render_template('reverse_image.html', endpoint_url=endpoint_url)
 
+s3_bucket = None
+
+def get_s3_bucket():
+    global s3_bucket
+    if s3_bucket is None:
+        conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
+        s3_bucket = conn.get_bucket(AWS_BUCKET)
+    return s3_bucket
+
 @app.route('/get_reverse_image_results/<local_image_path>')
 def get_reverse_image_results(local_image_path):
-    global image_searcher
-    if image_searcher is None:
-        image_searcher = ReverseImageSearcher()
-
-    return image_searcher.get_results(local_image_path)
+    bucket = get_s3_bucket()
+    return reverse_image.get_results(local_image_path, bucket)
 
 @app.route('/timeline', methods=['POST'])
 def timeline():
