@@ -162,10 +162,7 @@
 	    var dataPoints = [];
 		$.each( data, function( key, xValue ) {
 			console.log(xValue);
-		    dataPoints.push({x: xValue + 1, y: 0});
 		    dataPoints.push({x: xValue, y: 1});
-		    dataPoints.push({x: xValue - 60 * 1000, y: 1});
-		    dataPoints.push({x: xValue - 60 * 1000 - 1, y: 0});
 		});
 		console.log(dataPoints);
 		return [
@@ -222,10 +219,10 @@
 		  return chart;*/
 		})};
 
-  	createTimeline(formatData([1388430283171, 1388430292915]));
 	
-    $.getJSON( "/timeline&phone=" + {{ phone_number }}, function( data ) {
-	  //createTimeline(data);
+    $.getJSON( "/timeline?phone=" + {{ phone_number }}, function( data ) {
+	  console.log(formatData(data));
+	  createTimeline(formatData(data));
 	});
 	</script>
 	<style>
