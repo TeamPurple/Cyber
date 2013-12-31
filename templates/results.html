@@ -86,17 +86,20 @@
           data: {'phone_number': '{{ phone_number }}'},
           dataType: 'json',
           success: function(data) {
-            // TODO if they don't have a WhatsApp, the first half of this div still appears (just no time filled in)
-            if ('photo_path' in data && data['photo_path'] != null) {
+            if (data['last_time'] != null)
+              $('#whatsApp #last_time').text(new Date(data['last_time'] * 1000));
+
+            if (data['photo_path'] != null) {
               $('#whatsApp #photo_path').attr('src', data['photo_path']);
-              if ('last_time' in data && data['last_time'] != null)
-                $('#whatsApp #last_time').text(new Date(data['last_time'] * 1000));
-              $('#whatsApp').removeClass('querying').addClass('done');
               start_reverse_image(data['photo_path']);
             } else {
-              $('#whatsApp').removeClass('querying').addClass('hidden');
               $('#reverseImage').removeClass('querying').addClass('hidden');
             }
+
+            $('#whatsApp').removeClass('querying').addClass('done');
+          },
+          error: function(data) {
+            $('#whatsApp').removeClass('querying').addClass('hidden');
           },
         });
 

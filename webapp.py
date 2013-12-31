@@ -36,6 +36,9 @@ def whatsapp_endpoint():
         last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
         last_time = time.mktime(last_time.timetuple())
 
+    if photo_path is None and last_time is None:
+        abort(404)
+
     data = dict(
         photo_path = photo_path,
         last_time = last_time,
