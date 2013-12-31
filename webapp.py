@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify
+from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
 from whatspy import Whatspy
 from datetime import datetime
 import time
@@ -33,8 +33,8 @@ def whatsapp_endpoint():
 
     # parse as a datetime
     if last_time:
-      last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
-    last_time = time.mktime(last_time.timetuple())
+        last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
+        last_time = time.mktime(last_time.timetuple())
 
     data = dict(
         photo_path = photo_path,
@@ -64,7 +64,10 @@ def reverse_image_endpoint():
 @app.route('/timeline', methods=['GET'])
 def timeline():
     phone = request.args['phone']
-    raw = json.loads(requests.get('http://50.112.143.163/?phone=' + phone).text)
+    r = requests.get('http://50.112.143.163/?phone=' + phone)
+    if r.status_code == 404:
+        abort(404)
+    raw = json.loads(r.text)
     stuff = {"data":map(lambda x: int(float(x)), raw["data"]), "number":int(raw["number"])}
     return jsonify(stuff)
 
@@ -72,6 +75,8 @@ def timeline():
 def facebook_endpoint():
     phone_number = request.form['phone_number']
     fbid = facebook.lookup_facebook_by_phone(phone_number)
+    if fbid is None:
+        abort(404)
 
     # get fb info
     token = FACEBOOK_APP_CREDS['app_id'] + '|' + FACEBOOK_APP_CREDS['app_secret']
@@ -84,7 +89,10 @@ def facebook_endpoint():
 
     # combine in dict
     d = dict(req)
-    d.update({'url':pic_req['data']['url']})
+    try:
+        d.update({'url':pic_req['data']['url']})
+    except:
+        pass
 
     return jsonify(d)
 
