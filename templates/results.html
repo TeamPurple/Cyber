@@ -20,9 +20,35 @@
 
     <style type="text/css">
       .querying .loading {
-        background-image: url('/static/images/spinner.gif');
-        width: 128px;
-        height: 128px;
+        width: 150px;
+        height: 150px;
+        border-radius: 75px;
+        background-color: #8977A3;
+        text-align: center;
+        padding-top: 46px;
+        margin: auto;
+        margin-top: 20px;
+      }
+      .loading .glyphicon {
+        -webkit-animation-name: ROTATE;
+        -webkit-animation-duration: 2000ms;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-name: ROTATE;
+        -moz-animation-duration: 2000ms;
+        -moz-animation-iteration-count: infinite;
+        -moz-animation-timing-function: linear;
+        -ms-animation-name: ROTATE;
+        -ms-animation-duration: 2000ms;
+        -ms-animation-iteration-count: infinite;
+        -ms-animation-timing-function: linear;
+        animation-name: ROTATE;
+        animation-duration: 2000ms;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+
+        color: #FFFFFF;
+        font-size: 40px;
       }
       .loaded, .querying .loaded {
         display: none;
@@ -154,7 +180,7 @@
     </div><!-- /.container -->
 
   	<div class="container widget querying" id="whatsApp">
-      <div class="loading"></div>
+      <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
       <div class="loaded">
         <h2>Last active on WhatsApp at <span id="last_time" /></h2>
         <div class="col-xs-12"><img id="photo_path" src="" /></div>
@@ -162,7 +188,7 @@
     </div>
 
     <div class="container widget querying" id="facebook">
-      <div class="loading"></div>
+      <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
       <div class="loaded">
         <h1>Facebook</h1>
         <h2>Name: <span id="fbname" /></h2>
@@ -173,19 +199,23 @@
     </div>
 
     <div class="container querying" id="reverseImage">
-      <div class="loading"></div>
+      <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
       <div class="loaded">
         <div class="container" id="resultsFrame">
         </div>
       </div>
     </div>
 
+    <!-- <div class="container querying">
+      <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
+    </div> -->
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/static/js/nv.d3.js"></script>
 	<script>
-	
+
 	var createBuckets = function(data) {
 		var bucket_list = []
 		var currentHour = (new Date).getHours();
@@ -227,17 +257,17 @@
 		      .datum(data)
 		    .transition().duration(500)
 		      .call(chart);
-			  
+
 		  chart.xAxis.axisLabel('Time')
 			    .tickFormat(function(d) {
 		  return d3.time.format('%I:%m %p')(new Date(d))
 	      });
 		  nv.utils.windowResize(chart.update);
           return chart;
-		
+
 		})};
 
-	
+
     $.getJSON( "/timeline?phone=" + {{ phone_number }}, function( data ) {
 	  console.log(createBuckets(data.data));
 	  createTimeline(createBuckets(data.data));
@@ -248,8 +278,8 @@
 	    height: 400px;
 	  }
 	</style>
- 
-	
+
+
   </body>
 </html>
 
