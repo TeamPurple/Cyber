@@ -136,48 +136,33 @@
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/static/js/nv.d3.js"></script>
 	<script>
-	/*
-	var testData = function() {
-	  var fakeData = [
-	    {x: 1388430283171, y: 1},
-	    {x: 1388430283171 + 5000, y: 0},
-	    {x: 1388430292915, y: 1},
-	    {x: 1388430292915 + 5000, y: 0},
-	  ];
- 
-	  return [
-	    {
-	      values: fakeData,
-	      key: 'Online Status',
-	      color: '#ff7f0e'
-	    }
-	  ];
-    createTimeline(testData); */
-
-	// data is an array of integers, each of which corresponds to the "last 
-	// signed out" time of the user. returns an array of objects for each
-	// point in the graph of the format {x: 1388430283171, y: 1}, where x is
-	// the timestamp and y is 1 if the user is signed in and 0 otherwise. 
-	var formatData = function(data) {
-	    var dataPoints = [];
-		$.each( data, function( key, xValue ) {
-			console.log(xValue);
-		    dataPoints.push({x: xValue, y: 1});
+	
+	var createBuckets = function(data) {
+		var bucket_list = []
+		for (var i = 0; i < 24; i++) {
+		    bucket_list.push({x: i, y: 0});
+		}
+		// return bucket for hour
+		$.each(data, function(key, unix_timestamp ) {
+		  console.log( unix_timestamp );
+  		  var date = new Date(unix_timestamp*1000);
+		  console.log( date );
+  		  var hour = date.getHours();
+		  bucket_list.push({x: hour, y: 1});
 		});
-		console.log(dataPoints);
 		return [
 	      {
-	        values: dataPoints,
+	        values: bucket_list,
 	        key: 'Online Status',
 	        color: '#ff7f0e'
 	      }
 	    ];
 	}
-	
 	var createTimeline = function(data) {
 
 		// initialize graph itself
 		nv.addGraph(function() {
+
 		var chart = nv.models.discreteBarChart()
 		      .x(function(d) { return d.x })
 		      .y(function(d) { return d.y })
@@ -192,37 +177,17 @@
 			  
 		  chart.xAxis.axisLabel('Time')
 			    .tickFormat(function(d) {
-			  return d3.time.format('%I:%m %p')(new Date(d))
-			      });
+		  return d3.time.format('%I:%m %p')(new Date(d))
+	      });
 		  nv.utils.windowResize(chart.update);
           return chart;
-		  
-		  /*
-		  var chart = nv.models.lineChart();
- 
-		  chart.xAxis.axisLabel('Time')
-		    .tickFormat(function(d) {
-		  return d3.time.format('%I:%m %p')(new Date(d))
-		      });
- 
-		  chart.yAxis
-		      .axisLabel('Online Status')
-		      .tickFormat(d3.format('.02f'));
- 
-		  d3.select('#chart svg')
-		      .datum(data)
-		    .transition().duration(500)
-		      .call(chart);
- 
-		  nv.utils.windowResize(chart.update);
- 
-		  return chart;*/
+		
 		})};
 
 	
     $.getJSON( "/timeline?phone=" + {{ phone_number }}, function( data ) {
-	  console.log(formatData(data));
-	  createTimeline(formatData(data));
+	  console.log(createBuckets(data.data));
+	  createTimeline(createBuckets(data.data));
 	});
 	</script>
 	<style>
