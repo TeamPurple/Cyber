@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Team Purple</title>
+    <title>Revealed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -42,6 +42,9 @@
       }
       #reverseImage #resultsFrame #name-match .google-qb-bmqc a {
         color: #FF44FF;
+      }
+      .header h1 a {
+        color: white;
       }
     </style>
 
@@ -100,8 +103,9 @@
   <body>
     <div class="container">
 
-      <div class="starter-template widget">
-        <h1>Results for {{ phone_number }}</h1>
+      <div class="starter-template widget header">
+        <h1><a href="/" target="_blank">Revealed</a></h1>
+        <h2>Results for {{ phone_number }}</h2>
       </div>
 
     <!-- We only expect each user to search once (total), so no need to show the form again
