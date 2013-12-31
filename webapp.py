@@ -73,9 +73,20 @@ def facebook_endpoint():
     phone_number = request.form['phone_number']
     fbid = facebook.lookup_facebook_by_phone(phone_number)
 
+    # get fb info
     token = FACEBOOK_APP_CREDS['app_id'] + '|' + FACEBOOK_APP_CREDS['app_secret']
     url = 'https://graph.facebook.com/' + str(fbid) + '?key=value&access_token=' + token
-    return jsonify(json.loads(requests.get(url).text))
+    req = json.loads(requests.get(url).text)
+
+    # get fb profile picture
+    pic_url = 'https://graph.facebook.com/' + str(fbid) + '/picture?redirect=false&width=400&key=value&access_token=' + token
+    pic_req = json.loads(requests.get(pic_url).text)
+
+    # combine in dict
+    d = dict(req)
+    d.update({'url':pic_req['data']['url']})
+
+    return jsonify(d)
 
 # Fire up the server
 if __name__ == '__main__':
