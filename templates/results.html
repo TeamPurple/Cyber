@@ -85,15 +85,16 @@
           dataType: 'json',
           success: function(data) {
             // TODO if they don't have a WhatsApp, the first half of this div still appears (just no time filled in)
-            if ('last_time' in data && data['last_time'] != "None")
-              $('#whatsApp #last_time').text(data['last_time']);
-            if ('photo_path' in data)
+            if ('photo_path' in data && data['photo_path'] != null) {
               $('#whatsApp #photo_path').attr('src', data['photo_path']);
-            $('#whatsApp').removeClass('querying').addClass('done');
-
-            if ('photo_path' in data)
+              if ('last_time' in data && data['last_time'] != null)
+                $('#whatsApp #last_time').text(new Date(data['last_time'] * 1000));
+              $('#whatsApp').removeClass('querying').addClass('done');
               start_reverse_image(data['photo_path']);
-            // bug: in the else branch, we end up showing the loading spinner in #reverseImage forever
+            } else {
+              $('#whatsApp').removeClass('querying').addClass('hidden');
+              $('#reverseImage').removeClass('querying').addClass('hidden');
+            }
           },
         });
 
@@ -113,21 +114,38 @@
             data: {'phone_number': phone},
             dataType: 'json',
             success: function(data) {
-              if (data != "None") {
+              if ('id' in data)
                 $("#facebook #fbid").text(data.id);
+              else
+                $("#facebook #spanid").addClass('hidden');
+
+              if ('name' in data)
                 $("#facebook #fbname").text(data.name);
+              else
+                $("#facebook #spanname").addClass('hidden');
+
+              if ('username' in data)
                 $("#facebook #fbusername").text(data.username);
+              else
+                $("#facebook #spanusername").addClass('hidden');
+
+              if ('gender' in data)
                 $("#facebook #fbgender").text(data.gender);
-                $('#facebook').removeClass('querying').addClass('done');
-              } else {
-                fail_cb();
-              }
+              else
+                $("#facebook #spangender").addClass('hidden');
+
+              if ('url' in data)
+                $("#facebook #fbimgurl").attr('src', data.url);
+              else
+                $("#facebook #fbimgurl").addClass('hidden');
+
+              $('#facebook').removeClass('querying').addClass('done');
             },
             error: fail_cb,
           });
         };
         no_facebook = function() {
-          $('#facebook').removeClass('querying');
+          $('#facebook').removeClass('querying').addClass('hidden');
         };
         try_second_phone = function() {
           try_phone(alt_phone_number, no_facebook);
@@ -180,8 +198,13 @@
 	  <button type="submit" class="btn btn-default">Search</button>
 	  </form>
 	-->
+    </div><!-- /.container -->
 
-    <div class="container widget querying" id="whatsApp">
+    <div id="chart">
+      <svg></svg>
+    </div>
+
+  	<div class="container widget querying" id="whatsApp">
       <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
       <div class="loaded">
         <h3>Last active on WhatsApp at <span id="last_time" /></h3>
@@ -272,9 +295,9 @@
 		// initialize graph itself
 		nv.addGraph(function() {
 
-		var chart = nv.models.discreteBarChart()
+	   	  var chart = nv.models.discreteBarChart()
 		      .x(function(d) { return d.x })
-		      .staggerLabels(true)
+		      .staggerLabels(false)
 		      .tooltips(true)
 			  .color(['white']);
 		  chart.xAxis.axisLabel('Hour');
@@ -289,20 +312,26 @@
 		      .style("fill", function(d, i){
 	              return "white";
 		      });
+
 		  nv.utils.windowResize(chart.update);
           return chart;
 
 		})};
 
 
-    $.getJSON( "/timeline?phone=" + {{ phone_number }}, function( data ) {
-	  console.log(createBuckets(data.data));
-	  createTimeline(createBuckets(data.data));
-	});
+    $.ajax({
+      url: "/timeline?phone=" + {{ phone_number }},
+      success: function( data ) {
+    	  createTimeline(createBuckets(data.data));
+      },
+      error: function( data ) {
+        $("#chart").hide();
+      },
+  	});
 	</script>
 	<style>
 	  #chart svg {
-	    height: 400px;
+	    height: 300px;
 	  }
 	  .nv-y text{
 	      display: none;
