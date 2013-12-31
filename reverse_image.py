@@ -34,7 +34,7 @@ def get_results(local_image_path, bucket):
     sel = lxml.cssselect.CSSSelector("#topstuff .qb-bmqc")
     matches = sel(html)
     if len(matches):
-        name_match = "<div id='name-match' class='widget'>" + _clean_html(matches[0]) + "</div>"
+        name_match = "<div id='name-match'>" + _clean_html(matches[0]) + "</div>"
         name_match = name_match.replace("Best guess for this image", "Google's best guess for name")
         name_match = name_match.replace('href="/', 'target="_blank" href="https://www.google.com/')
 
