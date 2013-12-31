@@ -62,10 +62,9 @@ def reverse_image_endpoint():
 @app.route('/timeline', methods=['GET'])
 def timeline():
     phone = request.args['phone']
-    print phone
-    r = requests.get('http://50.112.143.163/?phone=' + phone)
-    print r.text
-    return jsonify(json.loads(r.text))
+    raw = json.loads(requests.get('http://50.112.143.163/?phone=' + phone).text)
+    stuff = {"data":map(lambda x: int(float(x)), raw["data"]), "number":int(raw["number"])}
+    return jsonify(stuff)
 
 @app.route('/ajax/facebook', methods=['POST'])
 def facebook_endpoint():
