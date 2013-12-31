@@ -20,7 +20,7 @@ def get_results(local_image_path, bucket):
 
     html = lxml.html.document_fromstring(r.text)
     # we only want these parts of the results page
-    selectors_to_keep = ["#ostyle", "#gstyle", "#cst style", "#_css0", "#topstuff .qb-bmqc", "#search"]
+    selectors_to_keep = ["#ostyle", "#gstyle", "#cst style", "#cst style:nth-of-type(9)", "#_css0", "#topstuff .qb-bmqc", "#search", "#xfoot > script"]
     search_results = ""
     for selector in selectors_to_keep:
         sel = lxml.cssselect.CSSSelector(selector)
@@ -55,6 +55,8 @@ def _clean_html(element):
             except:
                 pass
         return "<style>%s</style>" % css.cssText
+    elif element.tag == "script":
+        return lxml.html.tostring(element)
     else:
         # monkeypatch from http://stackoverflow.com/questions/15386605/lxml-cleaner-to-ignore-base64-image
         # this prevents lxml from removing the data:image
