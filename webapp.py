@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify
 from whatspy import Whatspy
 from datetime import datetime
+import time
 import requests, json
 app = Flask(__name__)
 
@@ -33,10 +34,11 @@ def whatsapp_endpoint():
     # parse as a datetime
     if last_time:
       last_time = datetime.strptime(last_time, "%a %b %d %H:%M:%S %Y")
+    last_time = time.mktime(last_time.timetuple())
 
     data = dict(
         photo_path = photo_path,
-        last_time = str(last_time),
+        last_time = last_time,
     )
     return json.dumps(data)
 
