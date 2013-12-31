@@ -24,13 +24,14 @@
         width: 128px;
         height: 128px;
       }
-      .querying .loaded {
+      .loaded, .querying .loaded {
         display: none;
       }
       .done .loading {
         display: none;
       }
       .done .loaded {
+        display: block;
       }
       #reverseImage #search-results {
         background-color: white;
@@ -70,20 +71,46 @@
           },
         });
 
-        // temporary hack to get this to work with Oz's data (his WhatsApp is 972 but his FB is 050)
-        var local_phone_number = '{{ phone_number }}'.replace(/^972/, "0");
-        $.ajax({
-          url: "{{ url_for('facebook_endpoint') }}",
-          type: 'POST',
-          data: {'phone_number': local_phone_number},
-          dataType: 'json',
-          success: function(data) {
-            if (data != "None")
-              $("#facebook #fbid").text(data);
-            $('#facebook').removeClass('querying').addClass('done');
-          },
-        });
+        var phone_number = '{{ phone_number }}';
+        // for Israelis, we may need to try a second number in FB
+        var alt_phone_number = null;
+        if (phone_number.indexOf("0") == 0) {
+          alt_phone_number = phone_number.replace(/^0/, "972");
+        } else if (phone_number.indexOf("972") == 0) {
+          alt_phone_number = phone_number.replace(/^972/, "0");
+        }
 
+        try_phone = function(phone, fail_cb) {
+          $.ajax({
+            url: "{{ url_for('facebook_endpoint') }}",
+            type: 'POST',
+            data: {'phone_number': phone},
+            dataType: 'json',
+            success: function(data) {
+              if (data != "None") {
+                $("#facebook #fbid").text(data);
+                $('#facebook').removeClass('querying').addClass('done');
+              } else {
+                fail_cb();
+              }
+            },
+            error: fail_cb,
+          });
+        };
+        no_facebook = function() {
+          $('#facebook').removeClass('querying');
+        };
+        try_second_phone = function() {
+          try_phone(alt_phone_number, no_facebook);
+        };
+        try_first_phone = function() {
+          if (alt_phone_number === null) {
+            try_phone(phone_number, no_facebook);
+          } else {
+            try_phone(phone_number, try_second_phone);
+          }
+        };
+        try_first_phone();
       });
 
       start_reverse_image = function(photo_path) {
