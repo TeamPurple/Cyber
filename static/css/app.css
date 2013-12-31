@@ -57,3 +57,15 @@ body {
   color: #303030;
   text-align: left;
 }
+.panel-heading {
+  position: relative;
+}
+.cta {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+.cta .glyphicon {
+  font-size: 22px;
+  color: #428BCA;
+}

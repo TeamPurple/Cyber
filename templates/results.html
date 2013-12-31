@@ -66,6 +66,7 @@
         font-size: 24px;
         font-weight: bold;
         padding-bottom: 12px;
+        color: #303030;
       }
       #reverseImage #resultsFrame #name-match .google-qb-bmqc a {
         color: #FF44FF;
@@ -200,22 +201,32 @@
 	-->
     </div><!-- /.container -->
 
-    <div id="chart">
-      <svg></svg>
-    </div>
-
   	<div class="container widget querying" id="whatsApp">
       <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
       <div class="loaded">
-        <h3>Last active on WhatsApp at <span id="last_time" /></h3>
-        <div class="col-xs-12"><img id="photo_path" src="" /></div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">WhatsApp Information</h3>
+            <div class="cta"><span class="glyphicon glyphicon-info-sign"></span></div>
+          </div>
+          <div class="panel-body">
+            <h3>Last active on WhatsApp at <span id="last_time" /></h3>
+            <div class="col-xs-12"><img id="photo_path" src="" /></div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="container widget">
-  	  <div id="chart">
-  	    <svg></svg>
-  	  </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">WhatsApp Activity</h3>
+        </div>
+        <div class="panel-body">
+      	  <div id="chart">
+      	    <svg></svg>
+      	  </div>
+        </div>
     </div>
     </div><!-- /.container -->
 
@@ -299,7 +310,7 @@
 		      .x(function(d) { return d.x })
 		      .staggerLabels(false)
 		      .tooltips(true)
-			  .color(['white']);
+			  .color(['black']);
 		  chart.xAxis.axisLabel('Hour');
 		  chart.yAxis.axisLabel('Frequency')
 			   .axisLabelDistance(40);
@@ -307,10 +318,10 @@
 		      .datum(data)
 		      .transition().duration(500)
 		      .call(chart)
-			  .attr("fill", "white");
+			  .attr("fill", "#303030");
 	      d3.selectAll("rect.nv-bar")
 		      .style("fill", function(d, i){
-	              return "white";
+	              return "#303030";
 		      });
 
 		  nv.utils.windowResize(chart.update);
@@ -325,7 +336,7 @@
     	  createTimeline(createBuckets(data.data));
       },
       error: function( data ) {
-        $("#chart").hide();
+        $("#chart").closest('.container').hide();
       },
   	});
 	</script>
