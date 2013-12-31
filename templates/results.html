@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Team Purple</title>
+    <title>Revealed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -24,13 +24,28 @@
         width: 128px;
         height: 128px;
       }
-      .querying .loaded {
+      .loaded, .querying .loaded {
         display: none;
       }
       .done .loading {
         display: none;
       }
       .done .loaded {
+        display: block;
+      }
+      #reverseImage #search-results {
+        background-color: white;
+      }
+      #reverseImage #resultsFrame #name-match .google-qb-bmqc {
+        font-size: 24px;
+        font-weight: bold;
+        padding-bottom: 12px;
+      }
+      #reverseImage #resultsFrame #name-match .google-qb-bmqc a {
+        color: #FF44FF;
+      }
+      .header h1 a {
+        color: white;
       }
     </style>
 
@@ -56,24 +71,49 @@
           },
         });
 
-        // temporary hack to get this to work with Oz's data (his WhatsApp is 972 but his FB is 050)
-        var local_phone_number = '{{ phone_number }}'.replace(/^972/, "0");
-        $.ajax({
-          url: "{{ url_for('facebook_endpoint') }}",
-          type: 'POST',
-          data: {'phone_number': local_phone_number},
-          dataType: 'json',
-          success: function(data) {
-            if (data != "None") {
-              $("#facebook #fbid").text(data.id);
-              $("#facebook #fbname").text(data.name);
-              $("#facebook #fbusername").text(data.username);
-              $("#facebook #fbgender").text(data.gender);
-            }
-            $('#facebook').removeClass('querying').addClass('done');
-          },
-        });
+        var phone_number = '{{ phone_number }}';
+        // for Israelis, we may need to try a second number in FB
+        var alt_phone_number = null;
+        if (phone_number.indexOf("0") == 0) {
+          alt_phone_number = phone_number.replace(/^0/, "972");
+        } else if (phone_number.indexOf("972") == 0) {
+          alt_phone_number = phone_number.replace(/^972/, "0");
+        }
 
+        try_phone = function(phone, fail_cb) {
+          $.ajax({
+            url: "{{ url_for('facebook_endpoint') }}",
+            type: 'POST',
+            data: {'phone_number': phone},
+            dataType: 'json',
+            success: function(data) {
+              if (data != "None") {
+                $("#facebook #fbid").text(data.id);
+                $("#facebook #fbname").text(data.name);
+                $("#facebook #fbusername").text(data.username);
+                $("#facebook #fbgender").text(data.gender);
+                $('#facebook').removeClass('querying').addClass('done');
+              } else {
+                fail_cb();
+              }
+            },
+            error: fail_cb,
+          });
+        };
+        no_facebook = function() {
+          $('#facebook').removeClass('querying');
+        };
+        try_second_phone = function() {
+          try_phone(alt_phone_number, no_facebook);
+        };
+        try_first_phone = function() {
+          if (alt_phone_number === null) {
+            try_phone(phone_number, no_facebook);
+          } else {
+            try_phone(phone_number, try_second_phone);
+          }
+        };
+        try_first_phone();
       });
 
       start_reverse_image = function(photo_path) {
@@ -83,7 +123,6 @@
           data: {'local_image_path': photo_path},
           success: function(data) {
             $('#reverseImage #resultsFrame').html(data);
-            $('#reverseImage #resultsFrame').css({'background-color': 'white'});
             $('#reverseImage').removeClass('querying').addClass('done');
           },
         });
@@ -94,8 +133,9 @@
   <body>
     <div class="container">
 
-      <div class="starter-template widget">
-        <h1>Results for {{ phone_number }}</h1>
+      <div class="starter-template widget header">
+        <h1><a href="/" target="_blank">Revealed</a></h1>
+        <h2>Results for {{ phone_number }}</h2>
       </div>
 
     <!-- We only expect each user to search once (total), so no need to show the form again
@@ -144,48 +184,33 @@
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="/static/js/nv.d3.js"></script>
 	<script>
-	/*
-	var testData = function() {
-	  var fakeData = [
-	    {x: 1388430283171, y: 1},
-	    {x: 1388430283171 + 5000, y: 0},
-	    {x: 1388430292915, y: 1},
-	    {x: 1388430292915 + 5000, y: 0},
-	  ];
- 
-	  return [
-	    {
-	      values: fakeData,
-	      key: 'Online Status',
-	      color: '#ff7f0e'
-	    }
-	  ];
-    createTimeline(testData); */
-
-	// data is an array of integers, each of which corresponds to the "last 
-	// signed out" time of the user. returns an array of objects for each
-	// point in the graph of the format {x: 1388430283171, y: 1}, where x is
-	// the timestamp and y is 1 if the user is signed in and 0 otherwise. 
-	var formatData = function(data) {
-	    var dataPoints = [];
-		$.each( data, function( key, xValue ) {
-			console.log(xValue);
-		    dataPoints.push({x: xValue, y: 1});
+	
+	var createBuckets = function(data) {
+		var bucket_list = []
+		for (var i = 0; i < 24; i++) {
+		    bucket_list.push({x: i, y: 0});
+		}
+		// return bucket for hour
+		$.each(data, function(key, unix_timestamp ) {
+		  console.log( unix_timestamp );
+  		  var date = new Date(unix_timestamp*1000);
+		  console.log( date );
+  		  var hour = date.getHours();
+		  bucket_list.push({x: hour, y: 1});
 		});
-		console.log(dataPoints);
 		return [
 	      {
-	        values: dataPoints,
+	        values: bucket_list,
 	        key: 'Online Status',
 	        color: '#ff7f0e'
 	      }
 	    ];
 	}
-	
 	var createTimeline = function(data) {
 
 		// initialize graph itself
 		nv.addGraph(function() {
+
 		var chart = nv.models.discreteBarChart()
 		      .x(function(d) { return d.x })
 		      .y(function(d) { return d.y })
@@ -200,37 +225,17 @@
 			  
 		  chart.xAxis.axisLabel('Time')
 			    .tickFormat(function(d) {
-			  return d3.time.format('%I:%m %p')(new Date(d))
-			      });
+		  return d3.time.format('%I:%m %p')(new Date(d))
+	      });
 		  nv.utils.windowResize(chart.update);
           return chart;
-		  
-		  /*
-		  var chart = nv.models.lineChart();
- 
-		  chart.xAxis.axisLabel('Time')
-		    .tickFormat(function(d) {
-		  return d3.time.format('%I:%m %p')(new Date(d))
-		      });
- 
-		  chart.yAxis
-		      .axisLabel('Online Status')
-		      .tickFormat(d3.format('.02f'));
- 
-		  d3.select('#chart svg')
-		      .datum(data)
-		    .transition().duration(500)
-		      .call(chart);
- 
-		  nv.utils.windowResize(chart.update);
- 
-		  return chart;*/
+		
 		})};
 
 	
     $.getJSON( "/timeline?phone=" + {{ phone_number }}, function( data ) {
-	  console.log(formatData(data));
-	  createTimeline(formatData(data));
+	  console.log(createBuckets(data.data));
+	  createTimeline(createBuckets(data.data));
 	});
 	</script>
 	<style>
