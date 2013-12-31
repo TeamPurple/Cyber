@@ -62,10 +62,14 @@ body {
 }
 .cta {
   position: absolute;
-  right: 5px;
+  right: 10px;
   top: 5px;
 }
 .cta .glyphicon {
   font-size: 22px;
   color: #428BCA;
+}
+.modal-dialog {
+  color: #303030;
+  text-align: left;
 }

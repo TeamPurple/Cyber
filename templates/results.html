@@ -207,7 +207,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">WhatsApp Information</h3>
-            <div class="cta"><span class="glyphicon glyphicon-info-sign"></span></div>
+            <div class="cta" data-explain="whatsapp"><span class="glyphicon glyphicon-info-sign"></span></div>
           </div>
           <div class="panel-body">
             <h3>Last active on WhatsApp at <span id="last_time" /></h3>
@@ -221,6 +221,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">WhatsApp Activity</h3>
+          <div class="cta" data-explain="whatsapp"><span class="glyphicon glyphicon-info-sign"></span></div>
         </div>
         <div class="panel-body">
       	  <div id="chart">
@@ -236,6 +237,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">Facebook Information</h3>
+            <div class="cta" data-explain="facebook"><span class="glyphicon glyphicon-info-sign"></span></div>
           </div>
           <div class="panel-body">
             <h5>Name: <span id="fbname" /></h5>
@@ -253,6 +255,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">Google Reverse Image Lookup</h3>
+            <div class="cta" data-explain="google"><span class="glyphicon glyphicon-info-sign"></span></div>
           </div>
           <div class="panel-body">
             <div id="resultsFrame">
@@ -260,6 +263,75 @@
         </div>
       </div>
     </div>
+
+
+    <!-- modals -->
+    <div class="modal fade modal-explain modal-explain-whatsapp">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Source: WhatsApp Online Status</h4>
+          </div>
+          <div class="modal-body">
+            <p>Your Whatsapp online status is always public.</p>
+            <p>
+              Click <a href="mailto:support@whatsapp.com" class=\"btn btn-primary">here</a>
+              to email Whatsapp about adding a privacy settings
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade modal-explain modal-explain-facebook">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Source: Facebook Graph Search</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              Your Facebook ID and data can be found from your phone number through a Facebook service.
+            <p>
+            <p>
+              Click <a href="https://www.facebook.com/settings?tab=privacy&section=findphone&view">here</a>
+              to prevent programs like this from finding your Facebook ID through your phone number.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade modal-explain modal-explain-google">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Source: Google Reverse Image Search</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              Your name can be found by Google through image-searching your profile pic.
+            </p>
+            <p>
+              Click <a href="https://www.facebook.com/settings?tab=privacy&section=search&view">here</a>
+              to hide your Facebook profile from search engines.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     <!-- <div class="container querying">
       <div class="loading"><span class="glyphicon glyphicon-refresh"></span></div>
@@ -349,6 +421,18 @@
 	  }
 	</style>
 
+  <script>
+
+    $('.modal-explain').modal({show: false});
+
+    $('.cta').on('click', function(e) {
+      var $btn = $(e.currentTarget);
+      var explainType = $btn.attr('data-explain');
+      console.log('opeining: ' + '.modal-explain-'+explainType);
+      $('.modal-explain-'+explainType).modal('show');
+    });
+
+  </script>
 
   </body>
 </html>
