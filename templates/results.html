@@ -187,16 +187,21 @@
 	
 	var createBuckets = function(data) {
 		var bucket_list = []
-		for (var i = 0; i < 24; i++) {
+		var currentHour = (new Date).getHours();
+		for (var i = currentHour; i < 24; i++) {
+		    bucket_list.push({x: i, y: 0});
+		}
+		for (var i = 0; i < currentHour; i++) {
 		    bucket_list.push({x: i, y: 0});
 		}
 		// return bucket for hour
 		$.each(data, function(key, unix_timestamp ) {
-		  console.log( unix_timestamp );
-  		  var date = new Date(unix_timestamp*1000);
-		  console.log( date );
-  		  var hour = date.getHours();
-		  bucket_list.push({x: hour, y: 1});
+		  console.log( unix_timestamp, (new Date).getTime());
+		  if (unix_timestamp * 1000 > (new Date).getTime() - 86400000) {
+		      var date = new Date(unix_timestamp*1000);
+  	    	  var hour = date.getHours();
+		      bucket_list.push({x: hour, y: 1});
+		  }
 		});
 		return [
 	      {
@@ -216,7 +221,6 @@
 		      .y(function(d) { return d.y })
 		      .staggerLabels(true)
 		      .tooltips(false)
-		      .showValues(true)
 
 		  d3.select('#chart svg')
 		      .datum(data)
