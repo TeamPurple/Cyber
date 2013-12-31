@@ -1,4 +1,5 @@
 config.py
+*.pem
 
 # ignore jpg files
 *.jpg
