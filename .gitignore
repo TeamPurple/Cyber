@@ -2,6 +2,7 @@ config.py
 
 # ignore jpg files
 *.jpg
+*.jpeg
 
 # Default .gitignore
 

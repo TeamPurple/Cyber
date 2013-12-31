@@ -8,20 +8,93 @@
     <link href="/static/css/app.css" rel="stylesheet">
     <link href="/static/css/nv.d3.css" rel="stylesheet">
 
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+
+    <style type="text/css">
+      .querying .loading {
+        background-image: url('/static/images/spinner.gif');
+        width: 128px;
+        height: 128px;
+      }
+      .querying .loaded {
+        display: none;
+      }
+      .done .loading {
+        display: none;
+      }
+      .done .loaded {
+      }
+    </style>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+        $.ajax({
+          url: "{{ url_for('whatsapp_endpoint') }}",
+          type: 'POST',
+          data: {'phone_number': '{{ phone_number }}'},
+          dataType: 'json',
+          success: function(data) {
+            // TODO if they don't have a WhatsApp, the first half of this div still appears (just no time filled in)
+            if ('last_time' in data && data['last_time'] != "None")
+              $('#whatsApp #last_time').text(data['last_time']);
+            if ('photo_path' in data)
+              $('#whatsApp #photo_path').attr('src', data['photo_path']);
+            $('#whatsApp').removeClass('querying').addClass('done');
+
+            if ('photo_path' in data)
+              start_reverse_image(data['photo_path']);
+            // bug: in the else branch, we end up showing the loading spinner in #reverseImage forever
+          },
+        });
+
+        // temporary hack to get this to work with Oz's data (his WhatsApp is 972 but his FB is 050)
+        var local_phone_number = '{{ phone_number }}'.replace(/^972/, "0");
+        $.ajax({
+          url: "{{ url_for('facebook_endpoint') }}",
+          type: 'POST',
+          data: {'phone_number': local_phone_number},
+          dataType: 'json',
+          success: function(data) {
+            if (data != "None")
+              $("#facebook #fbid").text(data);
+            $('#facebook').removeClass('querying').addClass('done');
+          },
+        });
+
+      });
+
+      start_reverse_image = function(photo_path) {
+        $.ajax({
+          url: "{{ url_for('reverse_image_endpoint') }}",
+          type: 'POST',
+          data: {'local_image_path': photo_path},
+          success: function(data) {
+            $('#reverseImage #resultsFrame').html(data);
+            $('#reverseImage #resultsFrame').css({'background-color': 'white'});
+            $('#reverseImage').removeClass('querying').addClass('done');
+          },
+        });
+      };
+    </script>
+
   </head>
   <body>
     <div class="container">
 
       <div class="starter-template widget">
         <h1>Results for {{ phone_number }}</h1>
-        <h2>Last active on WhatsApp at {{ last_time }}</h2>
       </div>
+
+    <!-- We only expect each user to search once (total), so no need to show the form again
 	  <form class="form-inline" role="form" action="" method="post">
 	  <div class="form-group">
 	    <label class="sr-only" for="phone_number">Phone number</label>
@@ -32,17 +105,32 @@
 	  <div id="chart">
 	    <svg></svg>
 	  </div>
+    -->
     </div><!-- /.container -->
 
-	<div class="container widget">
-	  <div class="row">
-	    <div class="col-xs-12"><img src="{{ photo_path }}"></div>
+  	<div class="container widget querying" id="whatsApp">
+      <div class="loading"></div>
+      <div class="loaded">
+        <h2>Last active on WhatsApp at <span id="last_time" /></h2>
+        <div class="col-xs-12"><img id="photo_path" src="" /></div>
       </div>
-	</div>
+    </div>
 
+    <div class="container widget querying" id="facebook">
+      <div class="loading"></div>
+      <div class="loaded">
+        <h2>Facebook user ID: <span id="fbid" /></h2>
+      </div>
+    </div>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery.js"></script>
+    <div class="container querying" id="reverseImage">
+      <div class="loading"></div>
+      <div class="loaded">
+        <div class="container" id="resultsFrame">
+        </div>
+      </div>
+    </div>
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -63,7 +151,6 @@
 	      color: '#ff7f0e'
 	    }
 	  ];
-	};
 
 	// data is an array of integers, each of which corresponds to the "last 
 	// signed out" time of the user. returns an array of objects for each
@@ -117,9 +204,9 @@
   	createTimeline(formatData([1388430283171, 1388430292915]));
 	
 	// TODO(dina): uncomment this when flask endpoint exists.
-//  $.getJSON( "/timeline&phone=" + {{ phone_number }}, function( data ) {
-// 	  createTimeline(data);
-// 	});
+    $.getJSON( "/timeline&phone=" + {{ phone_number }}, function( data ) {
+	  createTimeline(data);
+	});
 	</script>
 	<style>
 	  #chart svg {

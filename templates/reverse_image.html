@@ -10,7 +10,7 @@
     <script src="https://code.jquery.com/jquery.js"></script>
 
     <script type="text/javascript">
-      var endpoint_url = "{{ endpoint_url }}";
+      var endpoint_url = "{{ url_for('reverse_image_endpoint') }}";
 
       showResults = function(data) {
         $('#resultsFrame').html(data);
@@ -19,6 +19,8 @@
       $(document).ready(function() {
         $.ajax({
           url: endpoint_url,
+          type: 'POST',
+          data: {'local_image_path': '{{ local_image_path}}' },
           success: showResults,
         });
       });
