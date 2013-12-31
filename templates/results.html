@@ -220,10 +220,12 @@
 		    .transition().duration(500)
 		      .call(chart);
 			  
-		  chart.xAxis.axisLabel('Time')
-			    .tickFormat(function(d) {
-		  return d3.time.format('%I:%m %p')(new Date(d))
-	      });
+		  chart.xAxis.axisLabel('Hour')
+		       .axisLabelDistance(40);
+		  chart.yAxis
+		       .axisLabel('Online Status')
+			   .axisLabelDistance(40);
+			   
 		  nv.utils.windowResize(chart.update);
           return chart;
 		
