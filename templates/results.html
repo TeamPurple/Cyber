@@ -64,8 +64,12 @@
           data: {'phone_number': local_phone_number},
           dataType: 'json',
           success: function(data) {
-            if (data != "None")
-              $("#facebook #fbid").text(data);
+            if (data != "None") {
+              $("#facebook #fbid").text(data.id);
+              $("#facebook #fbname").text(data.name);
+              $("#facebook #fbusername").text(data.username);
+              $("#facebook #fbgender").text(data.gender);
+            }
             $('#facebook').removeClass('querying').addClass('done');
           },
         });
@@ -119,7 +123,11 @@
     <div class="container widget querying" id="facebook">
       <div class="loading"></div>
       <div class="loaded">
-        <h2>Facebook user ID: <span id="fbid" /></h2>
+        <h1>Facebook</h1>
+        <h2>Name: <span id="fbname" /></h2>
+        <h2>Facebook ID: <span id="fbid" /></h2>
+        <h2>Facebook login: <span id="fbusername" /></h2>
+        <h2>Gender: <span id="fbgender" /></h2>
       </div>
     </div>
 
