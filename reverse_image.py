@@ -9,6 +9,7 @@ import lxml.cssselect
 import cssutils
 import re
 import logging
+from util import cache
 
 class ReverseImageSearcher(object):
     def __init__(self):
@@ -16,6 +17,7 @@ class ReverseImageSearcher(object):
         self.bucket = conn.get_bucket(AWS_BUCKET)
         cssutils.log.setLevel(logging.FATAL)
 
+    @cache()
     def get_results(self, local_image_path):
         image_url = self._upload_to_s3(local_image_path)
         # fake the user agent so we actually get results
