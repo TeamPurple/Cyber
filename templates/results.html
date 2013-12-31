@@ -221,7 +221,7 @@
 		var currentHour = (new Date).getHours();
 		var loginFrequency = new Object();
 		for (var i = 0; i < 24; i++) {
-			loginFrequency[i] = 0.1;
+			loginFrequency[i] = 0;
 		}
 		// return bucket for hour
 		$.each(data, function(key, unix_timestamp ) {
@@ -261,7 +261,7 @@
 			   .axisLabelDistance(40);
 		  d3.select('#chart svg')
 		      .datum(data)
-		    .transition().duration(500)
+		      .transition().duration(500)
 		      .call(chart)
 			  .attr("fill", "white");
 	      d3.selectAll("rect.nv-bar")
