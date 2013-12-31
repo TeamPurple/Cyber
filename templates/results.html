@@ -86,7 +86,7 @@
           success: function(data) {
             // TODO if they don't have a WhatsApp, the first half of this div still appears (just no time filled in)
             if ('last_time' in data && data['last_time'] != "None")
-              $('#whatsApp #last_time').text(data['last_time']);
+              $('#whatsApp #last_time').text(new Date(data['last_time'] * 1000));
             if ('photo_path' in data)
               $('#whatsApp #photo_path').attr('src', data['photo_path']);
             $('#whatsApp').removeClass('querying').addClass('done');
