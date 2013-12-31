@@ -20,7 +20,7 @@ def get_results(local_image_path, bucket):
 
     html = lxml.html.document_fromstring(r.text)
     # we only want these parts of the results page
-    selectors_to_keep = ["#ostyle", "#gstyle", "#cst style", "#cst style:nth-of-type(9)", "#_css0", "#topstuff .qb-bmqc", "#search", "#xfoot > script"]
+    selectors_to_keep = ["#ostyle", "#gstyle", "#cst style", "#cst style:nth-of-type(9)", "#_css0", "#search", "#xfoot > script"]
     search_results = ""
     for selector in selectors_to_keep:
         sel = lxml.cssselect.CSSSelector(selector)
@@ -28,7 +28,16 @@ def get_results(local_image_path, bucket):
         if len(matches):
             # for each set of matches, just take the first one and clean it up
             search_results += _clean_html(matches[0])
-    return search_results
+    search_results = "<div id='search-results'>" + search_results + "</div>"
+
+    name_match = ""
+    sel = lxml.cssselect.CSSSelector("#topstuff .qb-bmqc")
+    matches = sel(html)
+    if len(matches):
+        name_match = "<div id='name-match' class='widget'>" + _clean_html(matches[0]) + "</div>"
+        name_match = name_match.replace("Best guess for this image", "Google's best guess for name")
+
+    return name_match + search_results
 
 def _upload_to_s3(local_image_path, bucket):
     k = bucket.new_key(str(uuid.uuid4()))

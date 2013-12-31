@@ -32,6 +32,17 @@
       }
       .done .loaded {
       }
+      #reverseImage #search-results {
+        background-color: white;
+      }
+      #reverseImage #resultsFrame #name-match .google-qb-bmqc {
+        font-size: 24px;
+        font-weight: bold;
+        padding-bottom: 12px;
+      }
+      #reverseImage #resultsFrame #name-match .google-qb-bmqc a {
+        color: #FF44FF;
+      }
     </style>
 
     <script type="text/javascript">
@@ -79,7 +90,6 @@
           data: {'local_image_path': photo_path},
           success: function(data) {
             $('#reverseImage #resultsFrame').html(data);
-            $('#reverseImage #resultsFrame').css({'background-color': 'white'});
             $('#reverseImage').removeClass('querying').addClass('done');
           },
         });
