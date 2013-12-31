@@ -53,3 +53,7 @@ body {
 .phone-input {
   width: 450px;
 }
+.panel-body {
+  color: #303030;
+  text-align: left;
+}
